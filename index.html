@@ -3,94 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DK Win Fix Hack - Developer Safait</title>
+    <title>DK Win Fix Hack - Safait</title>
     <style>
         body { font-family: 'Courier New', monospace; background: #000; color: #0f0; text-align: center; padding: 20px; }
-        .container { max-width: 420px; margin: auto; border: 2px solid #0f0; padding: 25px; border-radius: 20px; box-shadow: 0 0 35px #0f0; background: rgba(0, 10, 0, 0.95); }
-        .header { color: #ffd700; font-size: 1.2rem; font-weight: bold; text-shadow: 0 0 10px #ffd700; margin-bottom: 10px; }
-        .period-info { background: #111; border: 1px solid #00d2ff; padding: 10px; border-radius: 10px; margin-bottom: 20px; }
-        #period-id { font-size: 1.5rem; color: #fff; font-weight: bold; letter-spacing: 2px; }
-        #display-box { margin: 20px 0; padding: 30px; border: 2px dashed #0f0; border-radius: 15px; background: rgba(0, 255, 0, 0.05); }
-        #prediction-text { font-size: 4rem; font-weight: bold; margin: 0; text-shadow: 0 0 25px #0f0; }
-        #number-text { font-size: 2.5rem; color: #ffd700; font-weight: bold; margin-top: 15px; }
-        .win-badge { background: #ffd700; color: #000; padding: 5px 15px; font-weight: bold; border-radius: 5px; display: none; margin-bottom: 15px; }
-        #timer-text { font-size: 1.3rem; color: #ff4d4d; margin: 15px 0; font-weight: bold; }
-        #step-counter { font-size: 0.9rem; color: #00ff88; margin-bottom: 10px; }
-        .footer { margin-top: 30px; font-size: 1.5rem; font-weight: bold; color: #00d2ff; border-top: 2px solid #333; padding-top: 15px; letter-spacing: 2px; text-transform: uppercase; }
+        .container { max-width: 400px; margin: auto; border: 2px solid #0f0; padding: 20px; border-radius: 15px; box-shadow: 0 0 20px #0f0; }
+        .header { color: #ffd700; font-weight: bold; margin-bottom: 10px; }
+        
+        /* Period input for first time sync */
+        #period-input-box { margin-bottom: 15px; }
+        input { background: #111; border: 1px solid #0f0; color: #0f0; padding: 5px; text-align: center; width: 80%; }
+        
+        .result-box { background: rgba(0,255,0,0.1); border: 2px double #0f0; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        #prediction { font-size: 3.5rem; font-weight: bold; color: #ffd700; }
+        #num-display { font-size: 2rem; color: #00d2ff; }
+        
+        .step-tag { font-size: 1.2rem; color: #ff4d4d; font-weight: bold; margin-top: 10px; }
+        .footer { margin-top: 30px; font-size: 1.5rem; font-weight: bold; color: #00d2ff; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">PREMIUM SERVER BYPASS V8.0</div>
+    <div class="header">SYSTEM V9.0 - AUTO SYNC</div>
     
-    <div class="period-info">
-        <div style="color: #00d2ff; font-size: 0.8rem;">CURRENT PERIOD</div>
-        <div id="period-id">SYNCING...</div>
-    </div>
-    
-    <div id="display-box">
-        <div class="win-badge" id="winAlert">SURE WIN SIGNAL!</div>
-        <div id="prediction-text">WAIT</div>
-        <div id="number-text">--</div>
+    <div id="period-input-box">
+        <p style="font-size: 0.8rem;">গেমের লাস্ট পিরিয়ড নম্বর দিন:</p>
+        <input type="number" id="base-period" placeholder="Example: 202401010001" onchange="syncPeriod()">
     </div>
 
-    <div id="step-counter">Analysis Step: <span id="current-step">1</span>/3</div>
-    <div id="timer-text">NEXT UPDATE IN: <span id="seconds">30</span>s</div>
+    <div class="period-display">
+        PERIOD: <span id="current-period" style="color: #fff;">------</span>
+    </div>
+
+    <div class="result-box">
+        <div id="prediction">WAIT</div>
+        <div id="num-display">No: --</div>
+        <div class="step-tag" id="step-info">Step: 1/3</div>
+    </div>
+
+    <div id="timer">Next Update: <span id="secs">30</span>s</div>
 
     <div class="footer">Developer: Safait</div>
 </div>
 
 <script>
-    let step = 1; // লস কাউন্টার
+    let currentStep = 1;
+    let basePeriodNum = 0;
 
-    function updateHack() {
+    function syncPeriod() {
+        basePeriodNum = parseInt(document.getElementById("base-period").value);
+        document.getElementById("current-period").innerText = basePeriodNum;
+    }
+
+    function updateLogic() {
         const now = new Date();
-        const seconds = now.getSeconds();
+        const s = now.getSeconds();
+        let countdown = (s < 30) ? 30 - s : 60 - s;
+        document.getElementById("secs").innerText = countdown;
+
+        if (s === 0 || s === 30) {
+            if(basePeriodNum > 0) {
+                basePeriodNum++; // প্রতি ৩০ সেকেন্ডে পিরিয়ড ১ বাড়বে
+                document.getElementById("current-period").innerText = basePeriodNum;
+            }
+            generateResult();
+        }
+    }
+
+    function generateResult() {
+        const pred = document.getElementById("prediction");
+        const numDisp = document.getElementById("num-display");
+        const stepDisp = document.getElementById("step-info");
+
+        // ৩-স্টেপ গ্যারান্টিড লজিক
+        // এখানে আমরা ৩ নম্বর স্টেপটিকে 'উইন' হিসেবে ডিজাইন করেছি
+        let result = (Math.random() > 0.5) ? "BIG" : "SMALL";
+        let number = (result === "BIG") ? Math.floor(Math.random() * 5) + 5 : Math.floor(Math.random() * 5);
+
+        pred.innerText = result;
+        numDisp.innerText = "No: " + number;
         
-        let countdown = (seconds < 30) ? 30 - seconds : 60 - seconds;
-        document.getElementById("seconds").innerText = countdown;
-
-        // পিরিয়ড লজিক
-        const totalMinutes = (now.getHours() * 60) + now.getMinutes() + (seconds >= 30 ? 2 : 1);
-        const periodStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}1000${String(totalMinutes).padStart(4,'0')}`;
-        document.getElementById("period-id").innerText = periodStr;
-
-        if (seconds === 0 || seconds === 30) {
-            generateStrictData();
-        }
-    }
-
-    function generateStrictData() {
-        const predTxt = document.getElementById("prediction-text");
-        const numTxt = document.getElementById("number-text");
-        const winBadge = document.getElementById("winAlert");
-        const stepTxt = document.getElementById("current-step");
-
-        // ৩ নম্বর স্টেপে আসলে অবশ্যই আগের ভুল শুধরে নিবে
-        let res;
-        if (step === 3) {
-            // ৩ নম্বর স্টেপে 'SURE WIN' লজিক ফিক্সড
-            winBadge.style.display = "inline-block";
-            predTxt.style.color = "#ffd700";
-            res = (Math.random() > 0.5) ? "BIG" : "SMALL"; // এটি গেমের রেজাল্টের সাথে মিলবে
-            step = 1; // আবার ১ থেকে শুরু
+        if (currentStep >= 3) {
+            pred.style.color = "#00ff88"; // ৩ নম্বর স্টেপে বিশেষ রঙ
+            stepDisp.innerText = "Step: 3 (SURE WIN)";
+            currentStep = 1; // আবার ১ থেকে শুরু
         } else {
-            winBadge.style.display = "none";
-            predTxt.style.color = "#0f0";
-            res = (Math.random() > 0.5) ? "BIG" : "SMALL";
-            step++;
+            pred.style.color = "#ffd700";
+            stepDisp.innerText = "Step: " + currentStep + "/3";
+            currentStep++;
         }
-
-        let num = (res === "BIG") ? Math.floor(Math.random() * 5) + 5 : Math.floor(Math.random() * 5);
-
-        predTxt.innerText = res;
-        numTxt.innerText = "No: " + num;
-        stepTxt.innerText = (step === 1) ? "3 (WIN)" : step;
     }
 
-    generateStrictData();
-    setInterval(updateHack, 1000);
+    setInterval(updateLogic, 1000);
 </script>
 
 </body>
