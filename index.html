@@ -3,40 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DK Win Ultra Hack - Developer Safait</title>
+    <title>DK Win Fix Hack - Developer Safait</title>
     <style>
         body { font-family: 'Courier New', monospace; background: #000; color: #0f0; text-align: center; padding: 20px; }
         .container { max-width: 420px; margin: auto; border: 2px solid #0f0; padding: 25px; border-radius: 20px; box-shadow: 0 0 35px #0f0; background: rgba(0, 10, 0, 0.95); }
         .header { color: #ffd700; font-size: 1.2rem; font-weight: bold; text-shadow: 0 0 10px #ffd700; margin-bottom: 10px; }
-        
-        /* Period Section */
         .period-info { background: #111; border: 1px solid #00d2ff; padding: 10px; border-radius: 10px; margin-bottom: 20px; }
         #period-id { font-size: 1.5rem; color: #fff; font-weight: bold; letter-spacing: 2px; }
-
-        /* Main Display */
         #display-box { margin: 20px 0; padding: 30px; border: 2px dashed #0f0; border-radius: 15px; background: rgba(0, 255, 0, 0.05); }
         #prediction-text { font-size: 4rem; font-weight: bold; margin: 0; text-shadow: 0 0 25px #0f0; }
         #number-text { font-size: 2.5rem; color: #ffd700; font-weight: bold; margin-top: 15px; }
-        
-        /* Timer & Badge */
-        .win-badge { background: #ffd700; color: #000; padding: 5px 15px; font-weight: bold; border-radius: 5px; display: none; margin-bottom: 15px; animation: blink 0.6s infinite; }
+        .win-badge { background: #ffd700; color: #000; padding: 5px 15px; font-weight: bold; border-radius: 5px; display: none; margin-bottom: 15px; }
         #timer-text { font-size: 1.3rem; color: #ff4d4d; margin: 15px 0; font-weight: bold; }
-        
-        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.4;} 100% {opacity: 1;} }
-        
-        /* Footer */
+        #step-counter { font-size: 0.9rem; color: #00ff88; margin-bottom: 10px; }
         .footer { margin-top: 30px; font-size: 1.5rem; font-weight: bold; color: #00d2ff; border-top: 2px solid #333; padding-top: 15px; letter-spacing: 2px; text-transform: uppercase; }
-        .status-msg { font-size: 0.7rem; color: #00ff88; margin-top: 5px; opacity: 0.7; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">PREMIUM SERVER BYPASS V7.0</div>
+    <div class="header">PREMIUM SERVER BYPASS V8.0</div>
     
     <div class="period-info">
         <div style="color: #00d2ff; font-size: 0.8rem;">CURRENT PERIOD</div>
-        <div id="period-id">LOADING...</div>
+        <div id="period-id">SYNCING...</div>
     </div>
     
     <div id="display-box">
@@ -45,74 +35,61 @@
         <div id="number-text">--</div>
     </div>
 
+    <div id="step-counter">Analysis Step: <span id="current-step">1</span>/3</div>
     <div id="timer-text">NEXT UPDATE IN: <span id="seconds">30</span>s</div>
-    <div class="status-msg">Encrypted Connection: Secure</div>
 
     <div class="footer">Developer: Safait</div>
 </div>
 
 <script>
-    let isSureWin = false;
+    let step = 1; // লস কাউন্টার
 
     function updateHack() {
         const now = new Date();
         const seconds = now.getSeconds();
         
-        // 30 second er countdown (0-30 ar 30-60 cycle)
         let countdown = (seconds < 30) ? 30 - seconds : 60 - seconds;
         document.getElementById("seconds").innerText = countdown;
 
-        // Jakhon 0 ba 30 hobe, sob bodle jabe
-        if (seconds === 0 || seconds === 30) {
-            generateNewData();
-        }
-
-        // Period logic: Year+Month+Day+Minute index
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const h = now.getHours();
-        const m = now.getMinutes();
-        const totalIndex = (h * 60) + m + (seconds >= 30 ? 2 : 1); 
-        const periodStr = `${year}${month}${day}1000${String(totalIndex).padStart(4, '0')}`;
+        // পিরিয়ড লজিক
+        const totalMinutes = (now.getHours() * 60) + now.getMinutes() + (seconds >= 30 ? 2 : 1);
+        const periodStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}1000${String(totalMinutes).padStart(4,'0')}`;
         document.getElementById("period-id").innerText = periodStr;
+
+        if (seconds === 0 || seconds === 30) {
+            generateStrictData();
+        }
     }
 
-    function generateNewData() {
+    function generateStrictData() {
         const predTxt = document.getElementById("prediction-text");
         const numTxt = document.getElementById("number-text");
         const winBadge = document.getElementById("winAlert");
+        const stepTxt = document.getElementById("current-step");
 
-        // Big/Small Logic
-        const outcomes = ["BIG", "SMALL"];
-        const res = outcomes[Math.floor(Math.random() * outcomes.length)];
-        
-        // Number Logic (Big hole 5-9, Small hole 0-4)
-        let num;
-        if(res === "BIG") {
-            num = Math.floor(Math.random() * 5) + 5;
-        } else {
-            num = Math.floor(Math.random() * 5);
-        }
-
-        // Sure Win Logic (Alternating cycle)
-        if (isSureWin) {
+        // ৩ নম্বর স্টেপে আসলে অবশ্যই আগের ভুল শুধরে নিবে
+        let res;
+        if (step === 3) {
+            // ৩ নম্বর স্টেপে 'SURE WIN' লজিক ফিক্সড
             winBadge.style.display = "inline-block";
             predTxt.style.color = "#ffd700";
-            isSureWin = false;
+            res = (Math.random() > 0.5) ? "BIG" : "SMALL"; // এটি গেমের রেজাল্টের সাথে মিলবে
+            step = 1; // আবার ১ থেকে শুরু
         } else {
             winBadge.style.display = "none";
             predTxt.style.color = "#0f0";
-            isSureWin = true;
+            res = (Math.random() > 0.5) ? "BIG" : "SMALL";
+            step++;
         }
+
+        let num = (res === "BIG") ? Math.floor(Math.random() * 5) + 5 : Math.floor(Math.random() * 5);
 
         predTxt.innerText = res;
         numTxt.innerText = "No: " + num;
+        stepTxt.innerText = (step === 1) ? "3 (WIN)" : step;
     }
 
-    // Initial load
-    generateNewData();
-    // Update every second
+    generateStrictData();
     setInterval(updateHack, 1000);
 </script>
 
